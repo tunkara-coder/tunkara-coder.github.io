@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nnaa Samaa Mankolou - BSM Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --secondary: #228B22;
+            --accent: #32CD32;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Nnaa Samaa Mankolou BSM Dashboard</h1>
+        <nav>
+            <a href="#credit-sales">Credit Sales</a>
+            <a href="#revenue">Revenue Tracking</a>
+            <a href="#disbursement">Fund Disbursement</a>
+            <a href="#documents">Governance</a>
+        </nav>
+    </header>
+
+    <main class="dashboard-grid">
+        
+        <!-- Credit Sales Section -->
+        <section id="credit-sales" class="metric-card">
+            <h2>📊 Credit Sales Tracking</h2>
+            <div class="credit-metrics">
+                <div class="metric">
+                    <span class="label">PVCs Issued:</span>
+                    <span class="value" id="issued-pvcs">0</span>
+                </div>
+                <div class="metric">
+                    <span class="label">PVCs Sold:</span>
+                    <span class="value" id="sold-pvcs">0</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Latest Sale:</span>
+                    <span class="value" id="latest-sale">-</span>
+                </div>
+            </div>
+            <canvas id="salesChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- Revenue Tracking Section -->
+        <section id="revenue" class="metric-card">
+            <h2>💰 Revenue Allocation (70/20/10 Model)</h2>
+            <div class="revenue-breakdown">
+                <div class="allocation">
+                    <span>Community Trust Fund: 70%</span>
+                    <progress value="70" max="100"></progress>
+                    <span id="trust-amount">$0</span>
+                </div>
+                <div class="allocation">
+                    <span>Project Operations: 20%</span>
+                    <progress value="20" max="100"></progress>
+                    <span id="operations-amount">$0</span>
+                </div>
+                <div class="allocation">
+                    <span>Risk Buffer: 10%</span>
+                    <progress value="10" max="100"></progress>
+                    <span id="buffer-amount">$0</span>
+                </div>
+            </div>
+            <canvas id="revenueChart" width="400" height="250"></canvas>
+        </section>
+
+        <!-- Fund Disbursement Section -->
+        <section id="disbursement" class="metric-card">
+            <h2>🎯 Fund Disbursement Tracking</h2>
+            <div class="disbursement-categories">
+                <div class="category">
+                    <h3>Direct Benefits (25%)</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;" id="direct-progress"></div>
+                    </div>
+                    <span id="direct-amount">$0 disbursed</span>
+                </div>
+                <div class="category">
+                    <h3>Community Projects (40%)</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;" id="projects-progress"></div>
+                    </div>
+                    <span id="projects-amount">$0 disbursed</span>
+                </div>
+                <div class="category">
+                    <h3>Livelihoods (15%)</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;" id="livelihoods-progress"></div>
+                    </div>
+                    <span id="livelihoods-amount">$0 disbursed</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Outcomes Section -->
+        <section class="metric-card">
+            <h2>🌿 Project Outcomes</h2>
+            <div class="outcomes-metrics">
+                <div class="outcome">
+                    <span>Mangrove Area Restored:</span>
+                    <span id="hectares-restored">0 ha</span>
+                </div>
+                <div class="outcome">
+                    <span>Households Participating:</span>
+                    <span id="households-participating">0</span>
+                </div>
+                <div class="outcome">
+                    <span>Carbon Sequestered:</span>
+                    <span id="carbon-sequestered">0 tCO₂e</span>
+                </div>
+            </div>
+            <div id="project-gallery">
+                <!-- Dynamic image gallery -->
+            </div>
+        </section>
+
+        <!-- Document Repository -->
+        <section id="documents" class="metric-card">
+            <h2>📑 Governance Documents</h2>
+            <div class="document-list">
+                <a href="#" class="doc-link" data-file="cap.pdf">📋 Current Community Action Plan</a>
+                <a href="#" class="doc-link" data-file="bsm-deed.pdf">⚖️ BSM Deed</a>
+                <a href="#" class="doc-link" data-file="project-agreement.pdf">📄 Project Agreement</a>
+                <a href="#" class="doc-link" data-file="meeting-minutes.pdf">📊 Latest BSM Council Minutes</a>
+            </div>
+        </section>
+
+        <!-- Grievance Mechanism -->
+        <section class="metric-card">
+            <h2>📢 Grievance Mechanism</h2>
+            <button onclick="openGrievanceForm()">Submit Concern</button>
+            <div id="grievance-log">
+                <h3>Recently Resolved Issues</h3>
+                <!-- Dynamic grievance log -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Dashboard Data Model
+        const dashboardData = {
+            credits: {
+                issued: 15000,
+                sold: 12000,
+                latestSale: "2024-01-15"
+            },
+            revenue: {
+                total: 250000,
+                allocation: {
+                    trust: 70,
+                    operations: 20,
+                    buffer: 10
+                }
+            },
+            disbursement: {
+                directBenefits: { allocated: 0, disbursed: 0 },
+                communityProjects: { allocated: 0, disbursed: 0 },
+                livelihoods: { allocated: 0, disbursed: 0 }
+            },
+            outcomes: {
+                hectares: 125,
+                households: 240,
+                carbon: 4500
+            }
+        };
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Sales Trend Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'PVCs Sold',
+                        data: [2000, 3500, 2800, 4200, 3900, 4500],
+                        borderColor: '#2E8B57',
+                        tension: 0.1
+                    }]
+                }
+            });
+
+            // Revenue Allocation Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Community Trust', 'Operations', 'Buffer'],
+                    datasets: [{
+                        data: [70, 20, 10],
+                        backgroundColor: ['#2E8B57', '#32CD32', '#90EE90']
+                    }]
+                }
+            });
+        }
+
+        // Update Dashboard Metrics
+        function updateMetrics() {
+            document.getElementById('issued-pvcs').textContent = 
+                dashboardData.credits.issued.toLocaleString();
+            document.getElementById('sold-pvcs').textContent = 
+                dashboardData.credits.sold.toLocaleString();
+            
+            // Calculate monetary values
+            const trustAmount = dashboardData.revenue.total * 0.7;
+            document.getElementById('trust-amount').textContent = `$${trustAmount.toLocaleString()}`;
+        }
+
+        // Grievance Management
+        function openGrievanceForm() {
+            // Implementation for grievance submission form
+            alert('Grievance form would open here with anonymous submission options');
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            updateMetrics();
+        });
+    </script>
+</body>
+</html>
